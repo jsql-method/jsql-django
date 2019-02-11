@@ -99,17 +99,30 @@ class JSQLExecutor:
 
     def substituteParams(self, query, params):
         result = query
+        splittedSQL = result
         if params is not None:
-            for key, value in params.items():
-                if isinstance(value, str):
-                    result = result.replace(":" + key, "'" + str(value) + "'")
-                else:
-                    result = result.replace(":" + key, str(value))
-        splittedSQL = re.findall(r":\w+", result)
-        errorMessage = "You have to include these params to your request: "
-        for s in splittedSQL:
-            if ":" in s and "'" not in s and "\"" not in s and "`" not in s:
-                errorMessage += s
+            if isinstance(params, dict):
+                for key, value in params.items():
+                    if isinstance(value, str):
+                        result = result.replace(":" + key, "'" + str(value) + "'")
+                    else:
+                        result = result.replace(":" + key, str(value))
+            else:
+                for param in params:
+                    if isinstance(param, str):
+                        result = result.replace('?', "'" + str(param) + "'", 1)
+                    else:
+                        result = result.replace('?', str(param), 1)
+        if isinstance(params, dict):
+            splittedSQL = re.findall(r":\w+", result)
+            errorMessage = "You have to include these params to your request: "
+            for s in splittedSQL:
+                if ":" in s and "'" not in s and "\"" not in s and "`" not in s:
+                    errorMessage += s
+                    self.paramsError = True
+        else:
+            if result.count("?") > 0:
+                errorMessage = "You forgot to pass " + str(result.count("?")) + " parameters"
                 self.paramsError = True
         if self.paramsError is True:
             return errorMessage

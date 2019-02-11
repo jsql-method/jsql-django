@@ -27,7 +27,7 @@ class JSQLConnector:
                    'MemberKey': getattr(settings, "MEMBER_KEY", None)}
         resp = ""
         cache = ExpiringDict(max_len=100, max_age_seconds=10)
-        cache["request"] = requests.get('http://softwarecartoon.com:9391/api/request/options/all', headers=headers)
+        cache["request"] = requests.get('http://localhost:9191/api/request/options/all', headers=headers)
         resp = cache.get("request").json()
         return {'code': resp["code"], 'data': resp}
 
@@ -36,7 +36,7 @@ class JSQLConnector:
                    'MemberKey': getattr(settings, "MEMBER_KEY", None)}
         resp = ""
         code = 100
-        url = "http://softwarecartoon.com:9391/api/request/queries"
+        url = "http://localhost:9191/api/request/queries"
         if self.checkIfObjectIsArray(token):
             data = "[\""
             for t in token:

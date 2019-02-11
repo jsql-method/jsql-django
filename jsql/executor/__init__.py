@@ -23,6 +23,8 @@ class JSQLExecutor:
         result = ""
         try:
             finalQuery = self.substituteParams(query["data"], params)
+            if finalQuery.split(' ', 1)[0].lower() != "select":
+                return {'code': 400, 'description': 'Only `SELECT` queries allowed in this method!'}
             if self.paramsError is True:
                 self.paramsError = False
                 return {'code': 400, 'description': finalQuery}
@@ -47,6 +49,8 @@ class JSQLExecutor:
             return {'code': query["code"], 'description': query["data"]}
         try:
             finalQuery = self.substituteParams(query["data"], params)
+            if finalQuery.split(' ', 1)[0].lower() != "update" and finalQuery.split(' ', 1)[0].lower() != "delete":
+                return {'code': 400, 'description': 'Only `UPDATE` or `DELETE` queries allowed in this method!'}
             if self.paramsError is True:
                 self.paramsError = False
                 return {'code': 400, 'description': finalQuery}
@@ -70,6 +74,8 @@ class JSQLExecutor:
             return {'code': query["code"], 'description': query["data"]}
         result = ""
         finalQuery = self.substituteParams(query["data"], params)
+        if finalQuery.split(' ', 1)[0].lower() != "insert":
+            return {'code': 400, 'description': 'Only `INSERT` queries allowed in this method!'}
         if self.paramsError is True:
             self.paramsError = False
             return {'code': 400, 'description': finalQuery}

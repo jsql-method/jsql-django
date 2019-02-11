@@ -23,11 +23,11 @@ class JSQLExecutor:
         result = ""
         try:
             finalQuery = self.substituteParams(query["data"], params)
-            if finalQuery.split(' ', 1)[0].lower() != "select":
-                return {'code': 400, 'description': 'Only `SELECT` queries allowed in this method!'}
-            if self.paramsError is True:
+            if self.paramsError is True or finalQuery.lower().startswith('cannot'):
                 self.paramsError = False
                 return {'code': 400, 'description': finalQuery}
+            if finalQuery.split(' ', 1)[0].lower() != "select":
+                return {'code': 400, 'description': 'Only `SELECT` queries allowed in this method!'}
             self.cursor.execute(finalQuery)
             columns = self.cursor.description
             result = [{self.toCamelCase(columns[index][0]): column for index, column in enumerate(value)} for value in
@@ -49,11 +49,11 @@ class JSQLExecutor:
             return {'code': query["code"], 'description': query["data"]}
         try:
             finalQuery = self.substituteParams(query["data"], params)
-            if finalQuery.split(' ', 1)[0].lower() != "update" and finalQuery.split(' ', 1)[0].lower() != "delete":
-                return {'code': 400, 'description': 'Only `UPDATE` or `DELETE` queries allowed in this method!'}
-            if self.paramsError is True:
+            if self.paramsError is True or finalQuery.lower().startswith('cannot'):
                 self.paramsError = False
                 return {'code': 400, 'description': finalQuery}
+            if finalQuery.split(' ', 1)[0].lower() != "update" and finalQuery.split(' ', 1)[0].lower() != "delete":
+                return {'code': 400, 'description': 'Only `UPDATE` or `DELETE` queries allowed in this method!'}
             self.cursor.execute(finalQuery)
         except Exception as e:
             return {'code': 400, 'description': str(e)}
@@ -74,11 +74,11 @@ class JSQLExecutor:
             return {'code': query["code"], 'description': query["data"]}
         result = ""
         finalQuery = self.substituteParams(query["data"], params)
-        if finalQuery.split(' ', 1)[0].lower() != "insert":
-            return {'code': 400, 'description': 'Only `INSERT` queries allowed in this method!'}
-        if self.paramsError is True:
+        if self.paramsError is True or finalQuery.lower().startswith('cannot'):
             self.paramsError = False
             return {'code': 400, 'description': finalQuery}
+        if finalQuery.split(' ', 1)[0].lower() != "insert":
+            return {'code': 400, 'description': 'Only `INSERT` queries allowed in this method!'}
         if dialect["data"]["data"]["databaseDialect"] == 'POSTGRES':
             try:
                 self.cursor.execute(finalQuery + ' returning id')

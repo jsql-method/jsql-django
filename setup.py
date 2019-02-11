@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="jsql-django",
-    version="1.0.3",
+    version="1.0.6",
     author="JSQL Sp. z o.o.",
     author_email="office@jsql.it",
     description="JSQL backend plugin for Django app",
